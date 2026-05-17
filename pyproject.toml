@@ -1,0 +1,42 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "infinihash-kyt-mcp"
+version = "0.1.0"
+description = "MCP server for Infinihash KYT — real-time blockchain transaction monitoring, sanctions screening, and SAR generation"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Infinihash", email = "jason@infinihash.com" }]
+keywords = ["mcp", "kyt", "aml", "compliance", "blockchain", "sanctions", "ofac", "infinihash"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Security",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.0.0",
+    "httpx>=0.27.0",
+]
+
+[project.urls]
+Homepage = "https://kyt.infinihash.com"
+Documentation = "https://kyt.infinihash.com/docs"
+Repository = "https://github.com/Infinihash/infinihash-kyt-mcp"
+"Trust Center" = "https://kyt.infinihash.com/kyt/trust"
+"API Reference" = "https://kyt.infinihash.com/kyt/developers"
+
+[project.scripts]
+infinihash-kyt-mcp = "infinihash_kyt_mcp.server:run"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/infinihash_kyt_mcp"]
