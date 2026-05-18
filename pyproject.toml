@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "infinihash-kyt-mcp"
-version = "0.1.0"
+version = "0.1.1"
 description = "MCP server for Infinihash KYT — real-time blockchain transaction monitoring, sanctions screening, and SAR generation"
 readme = "README.md"
 license = { text = "MIT" }

@@ -1,5 +1,7 @@
 # infinihash-kyt-mcp
 
+<!-- mcp-name: io.github.Infinihash/infinihash-kyt-mcp -->
+
 MCP server for [Infinihash KYT](https://kyt.infinihash.com) — real-time blockchain transaction monitoring, sanctions screening, and SAR generation as MCP tools.
 
 Gives any MCP-compatible agent (Claude Desktop, Cursor, Cline, automation pipelines) access to:
