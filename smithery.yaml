@@ -1,0 +1,30 @@
+# Smithery configuration for infinihash-kyt-mcp.
+# Docs: https://smithery.ai/docs/build
+
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    required:
+      - kytApiKey
+    properties:
+      kytApiKey:
+        type: string
+        title: KYT API Key
+        description: >
+          Get a free key at https://kyt.infinihash.com/kyt/settings/api-keys.
+          Free tier: 100 screenings/month, no credit card.
+      baseUrl:
+        type: string
+        title: KYT base URL (advanced)
+        description: Override only for self-hosted or staging environments.
+        default: https://kyt.infinihash.com/api/v1
+  commandFunction: |
+    (config) => ({
+      command: "uvx",
+      args: ["infinihash-kyt-mcp"],
+      env: {
+        KYT_API_KEY: config.kytApiKey,
+        KYT_BASE_URL: config.baseUrl || "https://kyt.infinihash.com/api/v1"
+      }
+    })
