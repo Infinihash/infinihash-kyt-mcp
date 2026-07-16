@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import json
 import os
+from urllib.parse import quote
 from typing import Any
 
 import httpx
@@ -38,6 +39,19 @@ BASE_URL = os.environ.get("KYT_BASE_URL", "https://kyt.infinihash.com/api/v1").r
 API_KEY  = os.environ.get("KYT_API_KEY", "")
 
 app = Server("infinihash-kyt")
+
+
+def _p(segment: str) -> str:
+    """URL-encode a single path/query segment.
+
+    Path & query parameters (wallet address, case_id, status) are
+    attacker-influenced. Without encoding, a value containing '/', '?', '#',
+    '&' or '..' rewrites the request URL and can redirect the call to an
+    unintended endpoint or inject extra query params (path / query injection).
+    quote(..., safe="") percent-encodes every reserved character so the value
+    always stays a single, inert segment.
+    """
+    return quote(str(segment), safe="")
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -274,7 +288,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
 
         elif name == "kyt_lookup_intel":
             address = arguments["address"]
-            result = await _request("GET", f"/intel/lookup/{address}")
+            result = await _request("GET", f"/intel/lookup/{_p(address)}")
             return _ok(result)
 
         elif name == "kyt_recent_screenings":
@@ -297,25 +311,25 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             limit = int(arguments.get("limit", 50))
             qs = f"?limit={limit}"
             if status and status != "all":
-                qs += f"&status={status}"
+                qs += f"&status={_p(status)}"
             result = await _request("GET", f"/cases{qs}")
             return _ok(result)
 
         elif name == "kyt_get_case":
             case_id = arguments["case_id"]
-            result = await _request("GET", f"/cases/{case_id}")
+            result = await _request("GET", f"/cases/{_p(case_id)}")
             return _ok(result)
 
         elif name == "kyt_add_case_note":
             case_id = arguments["case_id"]
             body = {"note": arguments["note"]}
-            result = await _request("POST", f"/cases/{case_id}/notes", body=body)
+            result = await _request("POST", f"/cases/{_p(case_id)}/notes", body=body)
             return _ok(result)
 
         elif name == "kyt_generate_sar":
             case_id = arguments["case_id"]
             # /cases/{id}/sar returns text/plain SAR draft
-            result = await _request("GET", f"/cases/{case_id}/sar")
+            result = await _request("GET", f"/cases/{_p(case_id)}/sar")
             return _ok(result)
 
         elif name == "kyt_stats":
