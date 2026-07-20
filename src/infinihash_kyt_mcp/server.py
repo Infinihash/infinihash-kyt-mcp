@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import json
 import os
+from urllib.parse import quote
 from typing import Any
 
 import httpx
@@ -274,7 +275,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
 
         elif name == "kyt_lookup_intel":
             address = arguments["address"]
-            result = await _request("GET", f"/intel/lookup/{address}")
+            result = await _request("GET", f"/intel/lookup/{quote(address, safe='')}")
             return _ok(result)
 
         elif name == "kyt_recent_screenings":
@@ -303,19 +304,19 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
 
         elif name == "kyt_get_case":
             case_id = arguments["case_id"]
-            result = await _request("GET", f"/cases/{case_id}")
+            result = await _request("GET", f"/cases/{quote(case_id, safe='')}")
             return _ok(result)
 
         elif name == "kyt_add_case_note":
             case_id = arguments["case_id"]
             body = {"note": arguments["note"]}
-            result = await _request("POST", f"/cases/{case_id}/notes", body=body)
+            result = await _request("POST", f"/cases/{quote(case_id, safe='')}/notes", body=body)
             return _ok(result)
 
         elif name == "kyt_generate_sar":
             case_id = arguments["case_id"]
             # /cases/{id}/sar returns text/plain SAR draft
-            result = await _request("GET", f"/cases/{case_id}/sar")
+            result = await _request("GET", f"/cases/{quote(case_id, safe='')}/sar")
             return _ok(result)
 
         elif name == "kyt_stats":
