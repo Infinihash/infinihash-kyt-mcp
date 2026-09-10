@@ -6,7 +6,7 @@ so any MCP-compatible agent (Claude Desktop, Cursor, automation pipelines)
 can screen wallets, open compliance cases, and generate SAR drafts without
 writing any HTTP glue.
 
-Tool surface (v0.1.0):
+Tool surface (v0.1.2):
   kyt_screen_wallet      — screen a wallet address against OFAC + risk labels
   kyt_lookup_intel       — get all known intel labels for an address
   kyt_recent_screenings  — list recent screenings for your org
@@ -46,7 +46,10 @@ app = Server("infinihash-kyt")
 def _headers(require_auth: bool = True) -> dict:
     h = {"Content-Type": "application/json"}
     if API_KEY:
-        # KYT backend accepts X-API-Key OR Bearer; send both for resilience.
+        # Intentional: the KYT backend accepts either X-API-Key or Authorization: Bearer,
+        # and this server sends both for resilience against either auth path changing.
+        # (The Python SDK sends only X-API-Key — that's a narrower but equally valid choice,
+        # not a bug; the two clients just made different tradeoffs here.)
         h["X-API-Key"] = API_KEY
         h["Authorization"] = f"Bearer {API_KEY}"
     elif require_auth:
