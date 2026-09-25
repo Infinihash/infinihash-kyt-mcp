@@ -17,7 +17,17 @@ Gives any MCP-compatible agent (Claude Desktop, Cursor, Cline, automation pipeli
 - **`kyt_stats`** — coverage stats (per-source breakdown)
 - **`kyt_health`** — backend health probe
 
-## Install
+## Hosted (no install)
+
+Connect straight from Claude.ai, Claude Desktop, or any MCP client that supports remote servers:
+
+- **URL:** `https://mcp.infinihash.com/mcp`. Sign in with your KYT API key when prompted (OAuth).
+- **No key yet?** `https://mcp.infinihash.com/free/mcp` gives anonymous, basic sanctions screening.
+- Claude Code: `claude mcp add --transport http infinihash-kyt https://mcp.infinihash.com/mcp`
+
+The hosted server adds `preflight_payment`: call it before an agent sends crypto. It returns ALLOW, REVIEW or BLOCK plus an Ed25519-signed receipt you can keep for examiners (`verify_receipt` checks it; public key at `/.well-known/kyt-receipt-key`).
+
+## Install (local, stdio)
 
 ```bash
 uvx infinihash-kyt-mcp

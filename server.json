@@ -1,8 +1,8 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.Infinihash/infinihash-kyt-mcp",
-  "description": "Blockchain compliance: screen wallets vs OFAC SDN + threat intel, open cases, generate SAR drafts",
-  "version": "0.1.1",
+  "description": "Blockchain compliance: screen wallets vs OFAC SDN + threat intel, pre-payment checks with signed receipts, cases and SAR drafts",
+  "version": "0.2.0",
   "repository": {
     "url": "https://github.com/Infinihash/infinihash-kyt-mcp",
     "source": "github"
@@ -30,6 +30,12 @@
           "isRequired": false
         }
       ]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.infinihash.com/mcp"
     }
   ]
 }
