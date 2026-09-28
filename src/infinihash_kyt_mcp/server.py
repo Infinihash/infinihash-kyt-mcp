@@ -6,7 +6,7 @@ so any MCP-compatible agent (Claude Desktop, Cursor, automation pipelines)
 can screen wallets, open compliance cases, and generate SAR drafts without
 writing any HTTP glue.
 
-Tool surface (v0.1.2):
+Tool surface (v0.1.3):
   kyt_screen_wallet      — screen a wallet address against OFAC + risk labels
   kyt_lookup_intel       — get all known intel labels for an address
   kyt_recent_screenings  — list recent screenings for your org
@@ -347,8 +347,36 @@ async def main() -> None:
         await app.run(read_stream, write_stream, app.create_initialization_options())
 
 
+def _parse_args(argv: list[str] | None = None) -> None:
+    import argparse
+    from . import __version__
+
+    parser = argparse.ArgumentParser(
+        prog="infinihash-kyt-mcp",
+        description=(
+            "MCP server for Infinihash KYT (stdio transport). Screen wallets, look up "
+            "intel, open cases and draft SARs from any MCP client."
+        ),
+        epilog=(
+            "Environment: KYT_API_KEY (required for most tools), "
+            "KYT_BASE_URL (default https://kyt.infinihash.com/api/v1)."
+        ),
+    )
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
+    parser.parse_args(argv)
+
+
 def run() -> None:
     import asyncio
+    import sys
+
+    _parse_args(sys.argv[1:])
+    if not hasattr(app, "list_tools"):
+        sys.exit(
+            "infinihash-kyt-mcp needs the mcp Python package >=1.0,<2.0 "
+            "(the installed version removed the decorator API). "
+            "Run: pip install \"mcp>=1.0.0,<2.0.0\""
+        )
     asyncio.run(main())
 
 
