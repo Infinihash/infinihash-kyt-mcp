@@ -93,11 +93,13 @@ TOOLS = [
         name="kyt_screen_wallet",
         description=(
             "Screen a single wallet address against OFAC SDN, stablecoin freezes, "
-            "ScamSniffer threat intel, and 18.8K+ community-reviewed labels. Returns a "
+            "ScamSniffer threat intel, and community-reviewed labels (current counts: "
+            "GET /api/v1/coverage). Returns a "
             "0-100 risk score, matched signals, exposure breakdown, an AI-generated "
             "investigation summary, and a recommended action (clear / review / block). "
-            "Use this BEFORE settling on-chain — sanctioned wallets are caught in <200ms "
-            "from the fast-path cache. Chain is auto-detected from the address format."
+            "Use this BEFORE settling on-chain. Known and cached addresses are answered "
+            "synchronously; a full analysis of a new address can take a few seconds. "
+            "Chain is auto-detected from the address format."
         ),
         inputSchema={
             "type": "object",
@@ -232,7 +234,7 @@ TOOLS = [
     Tool(
         name="kyt_stats",
         description=(
-            "Return KYT coverage stats: total labeled addresses (~29K+), per-tier "
+            "Return KYT coverage stats: total labeled addresses, per-tier "
             "breakdown (T1 OFAC, T2 threat intel, T3 on-chain freezes, T4 community), "
             "data sources, and update cadence. Useful for compliance documentation."
         ),
