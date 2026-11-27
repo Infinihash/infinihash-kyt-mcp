@@ -86,6 +86,71 @@ def _err(msg: str) -> list[TextContent]:
     return [TextContent(type="text", text=f"Error: {msg}")]
 
 
+# ── Screening response mapping ────────────────────────────────────────────────
+# Field names follow the KYT engine's ScreenResponse (clearauthority-kyt
+# app/schemas/screen.py; live: GET /api/v1/openapi.json). The engine returns
+# `value`, `risk_score`, `flags` (signal names), `events`, `entity_name` and
+# `narrative` -- not `address` / `score` / `signals` / `entity` /
+# `ai_narrative`, which earlier versions of this server read and so always
+# returned null. The output keys below are unchanged for existing agents.
+
+PENDING_STATUSES = frozenset({"queued", "processing"})
+# Seconds to wait between polls of GET /screen/{id} while a new address is
+# analysed asynchronously (~20s in total). Tests set this to zeros.
+_POLL_DELAYS: tuple[float, ...] = (1, 1, 2, 2, 3, 3, 4, 4)
+
+
+def _signal_names(result: dict) -> list[str]:
+    flags = result.get("flags")
+    if isinstance(flags, list):
+        return [f for f in flags if isinstance(f, str)]
+    return [e["signal"] for e in (result.get("events") or [])
+            if isinstance(e, dict) and e.get("signal")]
+
+
+def _slim_screening(result: dict) -> dict:
+    """Trim a ScreenResponse to the fields an agent needs."""
+    if not isinstance(result, dict):
+        return {"raw": result}
+    explanation = result.get("explanation") or {}
+    slim = {
+        "id": result.get("id"),
+        "status": result.get("status"),
+        "address": result.get("value"),
+        "chain": result.get("chain"),
+        "risk_level": result.get("risk_level"),
+        "score": result.get("risk_score"),
+        "verdict": result.get("verdict"),
+        "action": result.get("action"),
+        "signals": _signal_names(result),
+        "entity": result.get("entity_name"),
+        "ai_summary": result.get("narrative"),
+        "score_explanation": explanation.get("summary") if isinstance(explanation, dict) else None,
+        "exposure_breakdown": result.get("exposure_breakdown"),
+        "screening_incomplete": result.get("screening_incomplete"),
+        "list_as_of": result.get("list_as_of"),
+    }
+    if slim["status"] in PENDING_STATUSES:
+        slim["note"] = (
+            "Analysis is still running; score and signals are not final. "
+            f"Fetch GET /screen/{slim['id']} again in a few seconds."
+        )
+    return slim
+
+
+async def _await_screening(result: Any) -> Any:
+    """Poll GET /screen/{id} while the engine is still analysing a new address."""
+    import asyncio
+
+    for delay in _POLL_DELAYS:
+        if not (isinstance(result, dict) and result.get("status") in PENDING_STATUSES
+                and result.get("id")):
+            break
+        await asyncio.sleep(delay)
+        result = await _request("GET", f"/screen/{quote(str(result['id']), safe='')}")
+    return result
+
+
 # ── Tool definitions ──────────────────────────────────────────────────────────
 
 TOOLS = [
@@ -96,7 +161,9 @@ TOOLS = [
             "ScamSniffer threat intel, and community-reviewed labels (current counts: "
             "GET /api/v1/coverage). Returns a "
             "0-100 risk score, matched signals, exposure breakdown, an AI-generated "
-            "investigation summary, and a recommended action (clear / review / block). "
+            "investigation summary, a verdict (clean / flagged / indeterminate / "
+            "incomplete) and a recommended action (allow / review / block_investigate / "
+            "block_report). "
             "Use this BEFORE settling on-chain. Known and cached addresses are answered "
             "synchronously; a full analysis of a new address can take a few seconds. "
             "Chain is auto-detected from the address format."
@@ -264,19 +331,8 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             if chain and chain != "auto":
                 body["chain"] = chain
             result = await _request("POST", "/screen", body=body)
-            # Trim the response to the most useful fields for an agent
-            slim = {
-                "id": result.get("id"),
-                "address": result.get("address"),
-                "chain": result.get("chain"),
-                "risk_level": result.get("risk_level"),
-                "score": result.get("score"),
-                "action": result.get("action") or result.get("recommend"),
-                "signals": result.get("signals", []),
-                "entity": result.get("entity"),
-                "ai_summary": result.get("ai_narrative") or result.get("narrative"),
-            }
-            return _ok(slim)
+            result = await _await_screening(result)
+            return _ok(_slim_screening(result))
 
         elif name == "kyt_lookup_intel":
             address = arguments["address"]
