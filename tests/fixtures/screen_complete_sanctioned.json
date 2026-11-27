@@ -1,0 +1,118 @@
+{
+  "action": "block_report",
+  "api_key_id": null,
+  "attribution": null,
+  "chain": "ethereum",
+  "completed_at": "2026-11-26T12:00:00Z",
+  "coverage": null,
+  "created_at": "2026-11-26T12:00:00Z",
+  "crosschain_hops": null,
+  "entity_confidence": null,
+  "entity_name": "Lazarus Group (Ronin Bridge exploiter)",
+  "entity_source": null,
+  "events": [
+    {
+      "description": "Direct sanctions list match",
+      "detail": {
+        "entity": "Lazarus Group (Ronin Bridge exploiter)",
+        "list": "OFAC SDN",
+        "reason": "DPRK"
+      },
+      "override": true,
+      "signal": "direct_sanctions_match",
+      "weight": 100
+    }
+  ],
+  "explanation": {
+    "attribution": [],
+    "capped_at_100": false,
+    "contributions": [
+      {
+        "description": "Direct sanctions list match",
+        "evidence": {
+          "entity": "Lazarus Group (Ronin Bridge exploiter)",
+          "list": "OFAC SDN"
+        },
+        "override": true,
+        "points": 100,
+        "share_pct": 100.0,
+        "signal": "direct_sanctions_match"
+      }
+    ],
+    "data_as_of": "2026-11-26 06:00:00+00:00",
+    "how": "An override signal sets the score to its own weight; other signals are not added.",
+    "informational": [],
+    "method": "override",
+    "not_checked": [],
+    "raw_total": 100,
+    "sanctions_floor_applied": false,
+    "summary": "Score 100 (critical) from 1 signal. Largest: direct_sanctions_match (override 100, entity Lazarus Group (Ronin Bridge exploiter), list OFAC SDN).",
+    "verdict": "flagged"
+  },
+  "exposure_breakdown": {
+    "receiving": {
+      "exchange": {
+        "count": 3,
+        "entities": [
+          "Binance"
+        ],
+        "label": "Exchange",
+        "pct": 75.0,
+        "usd": 1500.0
+      },
+      "mixer": {
+        "count": 1,
+        "entities": [],
+        "label": "Mixer",
+        "pct": 25.0,
+        "usd": 500.0
+      }
+    },
+    "sending": {
+      "unidentified": {
+        "count": 0,
+        "label": "Unknown/Unattributed",
+        "pct": 100.0,
+        "usd": null
+      }
+    }
+  },
+  "flags": [
+    "direct_sanctions_match"
+  ],
+  "id": "5b0c7e2a-6f3e-4a51-9d0a-1f2e3d4c5b6a",
+  "list_as_of": "2026-11-26T06:00:00Z",
+  "narrative": "BLOCKED: Lazarus Group (Ronin Bridge exploiter). Active sanctions listing on OFAC SDN (DPRK). Do not transact; consider SAR filing obligations.",
+  "risk_level": "critical",
+  "risk_score": 100,
+  "screening_incomplete": null,
+  "status": "complete",
+  "trace": {
+    "entity_name": "Lazarus Group (Ronin Bridge exploiter)",
+    "list_as_of": "2026-11-26T06:00:00+00:00",
+    "list_name": "OFAC SDN",
+    "narrative": "BLOCKED: Lazarus Group (Ronin Bridge exploiter). Active sanctions listing on OFAC SDN (DPRK). Do not transact; consider SAR filing obligations.",
+    "onchain_meta": {
+      "receiving_exposure": {
+        "exchange": {
+          "count": 3,
+          "entities": [
+            "Binance"
+          ],
+          "usd": 1500.0
+        },
+        "mixer": {
+          "count": 1,
+          "entities": [],
+          "usd": 500.0
+        }
+      }
+    },
+    "reason": "sanctions_gate",
+    "source": "sanctions_entries",
+    "verdict": "flagged"
+  },
+  "type": "wallet",
+  "value": "0x098B716B8Aaf21512996dC57EB0615e2383E2f96",
+  "verdict": "flagged"
+}
